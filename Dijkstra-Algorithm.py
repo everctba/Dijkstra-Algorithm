@@ -19,10 +19,10 @@ grid = []
 class Box:
    def __init__(self, i, j):
       self.x = i
-      self.j = j
+      self.y = j
       
-      def draw(self, win, color):
-         pygame.draw.rect(win, color, (self.x * box_width, self.y * box_height, box_width - 2, box_height - 2))
+   def draw(self, win, color):
+      pygame.draw.rect(win, color, (self.x * box_width, self.y * box_height, box_width - 1, box_height - 1))
 
 # Create Grid
 for i in range(columns):
