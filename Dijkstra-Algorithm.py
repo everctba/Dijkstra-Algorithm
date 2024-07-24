@@ -92,12 +92,12 @@ def main():
             x = pygame.mouse.get_pos()[0]
             y = pygame.mouse.get_pos()[1]
             # DraWall
-            if event.button[0]:
+            if event.buttons[0]:
                i = x // box_width
                j = y // box_height
                grid[i][j].wall = True
             # Set Target
-            if event.button[2] and not target_box_set:
+            if event.buttons[2] and not target_box_set:
                i = x // box_width
                j = y // box_height
                target_box = grid[i][j]
@@ -120,6 +120,7 @@ def main():
                for neighbour in current_box.neighbours:
                   if not neighbour.queued and not neighbour.wall:
                      neighbour.queued = True
+                     neighbour.prior = current_box
                      queue.append(neighbour)
          else:
             if searching:
