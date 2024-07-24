@@ -43,7 +43,9 @@ class Box:
       if self.y < rows - 1:
          self.neighbours.append(grid[self.x][self.y + 1])
          
-            
+# Initialize Pygame's font module
+pygame.font.init()
+font = pygame.font.SysFont("Calibri", 24)            
 # Create Grid
 for i in range(columns):
    arr = []
@@ -57,10 +59,10 @@ for i in range(columns):
    for j in range(rows):
       grid[i][j].set_neighbours()
 
-start_box = grid[0][0]
-start_box.start = True
-start_box.visited = True
-queue.append(start_box)
+# start_box = grid[0][0]
+# start_box.start = True
+# start_box.visited = True
+# queue.append(start_box)
 
 def main():
    begin_search = False
@@ -139,7 +141,10 @@ def main():
                box.draw(window, (200, 0, 0))
                
             if box.visited:
-               box.draw(window, (0, 200, 0))   
+               box.draw(window, (0, 200, 0))  
+               
+            if box in path:
+               box.draw(window, (0, 0, 200))   
                
             if box.start:
                box.draw(window, (0,200,200))
@@ -149,7 +154,18 @@ def main():
             
             if box.target:
                box.draw(window, (200, 200, 0))
-      
+         
+            # Render instructions text
+         instructions = [
+            "Instructions:",
+            "1. Left click to set start",
+            "2. Left click and hold to draw walls",
+            "3. Right click to set target",
+            "4. Press SPACE to run"
+         ]
+         for i, instruction in enumerate(instructions):
+            text_surface = font.render(instruction, True, (255, 255, 255))
+            window.blit(text_surface, (0, WINDOW_HEIGHT - (len(instructions) - i) * 20 - 10))   
       
       pygame.display.flip()
       
