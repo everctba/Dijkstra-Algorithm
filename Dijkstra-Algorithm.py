@@ -1,4 +1,4 @@
-from curses.ascii import controlnames
+# from curses.ascii import controlnames
 from tkinter import messagebox, Tk 
 import pygame
 import sys
@@ -17,7 +17,7 @@ box_height = WINDOW_HEIGHT // rows
 
 grid = []
 queue = []
-
+path = []
 class Box:
    def __init__(self, i, j):
       self.x = i
@@ -28,11 +28,12 @@ class Box:
       self.queued = False
       self.visited = False
       self.neighbours = []
-      
+      self.prior = None    
+        
    def draw(self, win, color):
       pygame.draw.rect(win, color, (self.x * box_width, self.y * box_height, box_width - 1, box_height - 1))
 
-   def set_neighbourd(self):
+   def set_neighbours(self):
       if self.x > 0:
          self.neighbours.append(grid[self.x -1 ] [self.y])
       if self.x < columns - 1:
@@ -66,6 +67,8 @@ def main():
    target_box_set = False
    searching = True
    taget_box = None
+   start_box_set = False
+   
    while True:
       for event in pygame.event.get():
          #Quit Window
@@ -73,17 +76,33 @@ def main():
             pygame.quit()
             sys.exit()
          # Mouse control
+         elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1: # Left mouse button click
+               x, y  = pygame.mouse.get_pos()
+               i = x // box_width
+               j = y // box_height
+               if not start_box_set and not grid[i][j].wall:
+                  start_box = grid[i][j]
+                  start_box.start = True
+                  start_box.visited = True
+                  queue.append(start_box)
+                  start_box_set = True
+               
          elif event.type == pygame.MOUSEMOTION:
             x = pygame.mouse.get_pos()[0]
             y = pygame.mouse.get_pos()[1]
-         # DraWall
-         if event.button[2]:
-            i = x // box_width
-            j = y // box_height
-            target_box = grid[i][j]
-            target_box.target = True
-            target__box_set = True
-            
+            # DraWall
+            if event.button[0]:
+               i = x // box_width
+               j = y // box_height
+               grid[i][j].wall = True
+            # Set Target
+            if event.button[2] and not target_box_set:
+               i = x // box_width
+               j = y // box_height
+               target_box = grid[i][j]
+               target_box.target = True
+               target_box_set = True            
          # Start Algorithm
          if event.type == pygame.KEYDOWN and target_box_set:
             begin_search = True
@@ -94,6 +113,9 @@ def main():
             current_box.visited = True
             if current_box == target_box:
                searching = False
+               while current_box.prior != start_box:
+                  path.append(current_box.prior)
+                  current_box = current_box.prior
             else:
                for neighbour in current_box.neighbours:
                   if not neighbour.queued and not neighbour.wall:
@@ -114,6 +136,9 @@ def main():
 
             if box.queued:
                box.draw(window, (200, 0, 0))
+               
+            if box.visited:
+               box.draw(window, (0, 200, 0))   
                
             if box.start:
                box.draw(window, (0,200,200))
